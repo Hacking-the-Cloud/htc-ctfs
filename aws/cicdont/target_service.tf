@@ -31,6 +31,22 @@ resource "aws_security_group" "allow_http" {
   }
 }
 
+resource "random_string" "gitlab_root_password" {
+  length = 24
+  special = false
+}
+
+data "template_file" "target_user_data" {
+  template = file("target_service_user_data.sh")
+  vars = {
+    gitlab_root_password = resource.random_string.gitlab_root_password.result
+  }
+}
+
+output "gitlab_root_password" {
+  value = resource.random_string.gitlab_root_password.result
+}
+
 /* This is the target of the ctf */
 resource "aws_instance" "target_service" {
   ami                         = data.aws_ami.ubuntu_ami.id
@@ -40,7 +56,7 @@ resource "aws_instance" "target_service" {
   vpc_security_group_ids      = [aws_security_group.allow_http.id]
   depends_on = [aws_internet_gateway.ctf_gw]
 
-  user_data = file("target_service_user_data.sh")
+  user_data = data.template_file.target_user_data.rendered
 
   tags = {
     Name = "target_service"
