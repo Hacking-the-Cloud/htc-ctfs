@@ -9,7 +9,7 @@ resource "aws_vpc" "ctf_vpc" {
 resource "aws_subnet" "ctf_subnet" {
   vpc_id            = aws_vpc.ctf_vpc.id
   availability_zone = "us-east-1a"
-  cidr_block = "10.0.0.0/24"
+  cidr_block        = "10.0.0.0/24"
 
   tags = {
     Name = "ctf_subnet"
@@ -79,7 +79,7 @@ resource "aws_route_table" "ctf_route_table" {
 }
 
 resource "aws_main_route_table_association" "ctf_main_rt_assoc" {
-  vpc_id = aws_vpc.ctf_vpc.id
+  vpc_id         = aws_vpc.ctf_vpc.id
   route_table_id = aws_route_table.ctf_route_table.id
 }
 
@@ -90,7 +90,7 @@ resource "aws_instance" "attackbox" {
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.ctf_subnet.id
   vpc_security_group_ids      = [aws_security_group.allow_everything.id]
-  depends_on = [aws_internet_gateway.ctf_gw]
+  depends_on                  = [aws_internet_gateway.ctf_gw]
 
   user_data = file("attackbox_user_data.sh")
 

@@ -1,4 +1,4 @@
-variable "username" {
+variable "player_username" {
   type        = string
   description = "What is your name? (only used for story purposes)"
 }

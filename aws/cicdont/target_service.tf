@@ -13,9 +13,9 @@ resource "aws_security_group" "allow_http" {
 
   ingress {
     description = "allow ssh"
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -32,7 +32,7 @@ resource "aws_security_group" "allow_http" {
 }
 
 resource "random_string" "gitlab_root_password" {
-  length = 24
+  length  = 24
   special = false
 }
 
@@ -40,6 +40,7 @@ data "template_file" "target_user_data" {
   template = file("target_service_user_data.sh")
   vars = {
     gitlab_root_password = resource.random_string.gitlab_root_password.result
+    player_username      = var.player_username
   }
 }
 
@@ -58,9 +59,14 @@ resource "aws_instance" "target_service" {
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.ctf_subnet.id
   vpc_security_group_ids      = [aws_security_group.allow_http.id]
-  depends_on = [aws_internet_gateway.ctf_gw]
+  depends_on                  = [aws_internet_gateway.ctf_gw]
 
   user_data = data.template_file.target_user_data.rendered
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
 
   tags = {
     Name = "target_service"
