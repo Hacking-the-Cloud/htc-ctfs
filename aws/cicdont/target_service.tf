@@ -47,6 +47,10 @@ output "gitlab_root_password" {
   value = resource.random_string.gitlab_root_password.result
 }
 
+output "target_ip" {
+  value = aws_instance.target_service.public_ip
+}
+
 /* This is the target of the ctf */
 resource "aws_instance" "target_service" {
   ami                         = data.aws_ami.ubuntu_ami.id
