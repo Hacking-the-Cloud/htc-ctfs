@@ -13,10 +13,16 @@ host_ip=$(curl -s checkip.amazonaws.com)
 EXTERNAL_URL="http://$host_ip" GITLAB_ROOT_PASSWORD="${gitlab_root_password}" apt-get install gitlab-ee
 gitlab-rails runner 'ApplicationSetting.last.update(signup_enabled: false)'
 gitlab-rails runner "token = User.admins.last.personal_access_tokens.create(scopes: [:api], name: 'automation'); token.set_token('token-string-here123'); token.save!"
-echo "done" > /tmp/done
 
-# Install GitLab Runner
+## Install GitLab Runner
+# Get Runner registration token
+runner_registration_token=$(curl -H "PRIVATE-TOKEN: aaaaaaaaaaaaaaaaaaaa" -X POST "http://localhost:80/api/v4/projects/2/runners/reset_registration_token" | jq -r '.token')
 
+# Register runner
+docker run --name gitlab-registration-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner register --executor "docker" --docker-image ubuntu:latest --url "http://172.17.0.1:80/" --registration-token $runner_registration_token --description "docker-runner" --non-interactive
+
+# Start runner
+docker run -d --name gitlab-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner
 
 # GAMEMASTER 
 # Ignore everything in the following block
@@ -36,29 +42,45 @@ curl -H "PRIVATE-TOKEN: token-string-here123" -X POST "http://localhost/api/v4/u
 
 # Create ashley access token
 gitlab-rails runner "token = User.find_by_username('ashley').personal_access_tokens.create(scopes: [:api], name: 'automation'); token.set_token('aaaaaaaaaaaaaaaaaaaa'); token.save!"
+gitlab-rails runner "token = User.find_by_username('daniel').personal_access_tokens.create(scopes: [:api], name: 'danielauto'); token.set_token('bbbbbbbbbbbbbbbbbbbb'); token.save!"
+gitlab-rails runner "token = User.find_by_username('sam').personal_access_tokens.create(scopes: [:api], name: 'samauto'); token.set_token('cccccccccccccccccccc'); token.save!"
 
-# Create chicken-docker project
-curl -H "PRIVATE-TOKEN: aaaaaaaaaaaaaaaaaaaa" -X POST "http://localhost:80/api/v4/projects?name=chicken-docker&default_branch=main&initialize_with_readme=true"
+# Create mvp-docker project
+curl -H "PRIVATE-TOKEN: aaaaaaaaaaaaaaaaaaaa" -X POST "http://localhost:80/api/v4/projects?name=mvp-docker&default_branch=main&import_url=https%3A%2F%2Fgithub.com%2FFrichetten%2Fmvp-docker&visibility=internal"
 
-# Get Runner registration token
-runner_registration_token=$(curl -H "PRIVATE-TOKEN: aaaaaaaaaaaaaaaaaaaa" -X POST "http://localhost:80/api/v4/projects/2/runners/reset_registration_token" | jq -r '.token')
+## Lore Stuff
 
-# Register runner
-docker run --name gitlab-registration-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner register --executor "docker" --docker-image ubuntu:latest --url "http://172.17.0.1:80/" --registration-token $runner_registration_token --description "docker-runner" --non-interactive
+# Creating Ashley's Projects
+curl -H "PRIVATE-TOKEN: aaaaaaaaaaaaaaaaaaaa" -X POST "http://localhost/api/v4/projects?name=hackingthe.cloud&default_branch=main&import_url=https%3A%2F%2Fgithub.com%2FHacking-the-Cloud%2Fhackingthe.cloud%2F&visibility=internal"
 
-# Start runner
-docker run -d --name gitlab-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner
+# Fix everyone's profile pictures
+cd /tmp
+git clone http://oauth-token:aaaaaaaaaaaaaaaaaaaa@localhost/ashley/mvp-docker
+curl -X PUT --form "avatar=@/tmp/mvp-docker/pics/ashley_50.jpg" -H "PRIVATE-TOKEN: token-string-here123" http://localhost/api/v4/users/2
+curl -X PUT --form "avatar=@/tmp/mvp-docker/pics/mark_50.jpg" -H "PRIVATE-TOKEN: token-string-here123" http://localhost/api/v4/users/3
+curl -X PUT --form "avatar=@/tmp/mvp-docker/pics/carmen_50.jpg" -H "PRIVATE-TOKEN: token-string-here123" http://localhost/api/v4/users/4
+curl -X PUT --form "avatar=@/tmp/mvp-docker/pics/sam_50.jpg" -H "PRIVATE-TOKEN: token-string-here123" http://localhost/api/v4/users/5
+curl -X PUT --form "avatar=@/tmp/mvp-docker/pics/louis_50.jpg" -H "PRIVATE-TOKEN: token-string-here123" http://localhost/api/v4/users/6
+curl -X PUT --form "avatar=@/tmp/mvp-docker/pics/daniel_50.jpg" -H "PRIVATE-TOKEN: token-string-here123" http://localhost/api/v4/users/7
+rm -rf /tmp/mvp-docker
 
-# Lore Stuff
-curl -H "PRIVATE-TOKEN: token-string-here123" -X POST "http://localhost/api/v4/projects/2/members" --data "user_id=8&access_level=30"
+
+# Creating Daniel's projects
+curl -H "PRIVATE-TOKEN: bbbbbbbbbbbbbbbbbbbb" -X POST "http://localhost/api/v4/projects?name=mkdocs-material&default_branch=master&import_url=https%3A%2F%2Fgithub.com%2Fsquidfunk%2Fmkdocs-material&visibility=internal"
+
+# Daniel's comment
+curl -H "PRIVATE-TOKEN: bbbbbbbbbbbbbbbbbbbb" -X POST "http://localhost/api/v4/projects/2/issues?title=Should%20we%20port%20this%20to%20Rust%3F&description=In%20Rust%20we%20Trust"
+
+# Creating Sam's projects
+curl -H "PRIVATE-TOKEN: cccccccccccccccccccc" -X POST "http://localhost/api/v4/projects?name=Dank-Learning&default_branch=master&import_url=https%3A%2F%2Fgithub.com%2Falpv95%2FDank-Learning&visibility=internal"
 
 # Create Player
 curl -H "PRIVATE-TOKEN: token-string-here123" -X POST "http://localhost/api/v4/users?email=${player_username}@cloud.local&username=${player_username}&name=${player_username}&password=${gitlab_root_password}&skip_confirmation=true"
 # Add player to target_project
 curl -H "PRIVATE-TOKEN: token-string-here123" -X POST "http://localhost/api/v4/projects/2/members" --data "user_id=8&access_level=30"
-echo token > /tmp/token
 
 # Assign the issue to the player
-curl -H "PRIVATE-TOKEN: token-string-here123" -X POST "http://localhost/api/v4/projects/2/issues?title=CI%2fCD%20Problem%20with%20Docker%20Container&assignee_id=8"
+curl -H "PRIVATE-TOKEN: aaaaaaaaaaaaaaaaaaaa" -X POST "http://localhost/api/v4/projects/2/issues?title=CI%2fCD%20Problem%20with%20Docker%20Container&assignee_id=8&description=Hey%20${player_username}%2C%20when%20you%20get%20a%20chance%20can%20you%20take%20a%20look%20at%20our%20CI%2FCD%20config%20%28gitlab-ci.yml%29%3F%20Something%20is%20going%20on%20with%20it.%20I%20was%20trying%20to%20build%20our%20new%20Docker%20container%20but%20it%20wasn%27t%20working%20right.%20Thanks%21"
+echo blah > /tmp/done
 
 ##########################################
