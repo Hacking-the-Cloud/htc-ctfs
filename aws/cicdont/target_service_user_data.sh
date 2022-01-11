@@ -44,6 +44,9 @@ curl -H "PRIVATE-TOKEN: token-string-here123" -X POST "http://localhost/api/v4/u
 gitlab-rails runner "token = User.find_by_username('ashley').personal_access_tokens.create(scopes: [:api], name: 'automation'); token.set_token('aaaaaaaaaaaaaaaaaaaa'); token.save!"
 gitlab-rails runner "token = User.find_by_username('daniel').personal_access_tokens.create(scopes: [:api], name: 'danielauto'); token.set_token('bbbbbbbbbbbbbbbbbbbb'); token.save!"
 gitlab-rails runner "token = User.find_by_username('sam').personal_access_tokens.create(scopes: [:api], name: 'samauto'); token.set_token('cccccccccccccccccccc'); token.save!"
+gitlab-rails runner "token = User.find_by_username('mark').personal_access_tokens.create(scopes: [:api], name: 'markauto'); token.set_token('dddddddddddddddddddd'); token.save!"
+gitlab-rails runner "token = User.find_by_username('carmen').personal_access_tokens.create(scopes: [:api], name: 'carmenauto'); token.set_token('eeeeeeeeeeeeeeeeeeee'); token.save!"
+gitlab-rails runner "token = User.find_by_username('louis').personal_access_tokens.create(scopes: [:api], name: 'louisauto'); token.set_token('ffffffffffffffffffff'); token.save!"
 
 # Create mvp-docker project
 curl -H "PRIVATE-TOKEN: aaaaaaaaaaaaaaaaaaaa" -X POST "http://localhost:80/api/v4/projects?name=mvp-docker&default_branch=main&import_url=https%3A%2F%2Fgithub.com%2FFrichetten%2Fmvp-docker&visibility=internal"
@@ -78,6 +81,25 @@ curl -H "PRIVATE-TOKEN: cccccccccccccccccccc" -X POST "http://localhost/api/v4/p
 curl -H "PRIVATE-TOKEN: token-string-here123" -X POST "http://localhost/api/v4/users?email=${player_username}@cloud.local&username=${player_username}&name=${player_username}&password=${gitlab_root_password}&skip_confirmation=true"
 # Add player to target_project
 curl -H "PRIVATE-TOKEN: token-string-here123" -X POST "http://localhost/api/v4/projects/2/members" --data "user_id=8&access_level=30"
+
+# Adding Ashley's Joke Comment
+curl -H "PRIVATE-TOKEN: aaaaaaaaaaaaaaaaaaaa" -X POST "http://localhost/api/v4/projects/2/issues/1/notes?body=No."
+# Daniel's response
+curl -X POST -H "PRIVATE-TOKEN: bbbbbbbbbbbbbbbbbbbb" "http://localhost/api/v4/projects/2/issues/1/notes?body=Oh%20come%20on%21%20Rust%20is%20great%21"
+# Sam's response
+curl -H "PRIVATE-TOKEN: cccccccccccccccccccc" -X POST "http://localhost/api/v4/projects/2/issues/1/notes?body=No."
+# Daniel's response
+curl -X POST -H "PRIVATE-TOKEN: bbbbbbbbbbbbbbbbbbbb" "http://localhost/api/v4/projects/2/issues/1/notes?body=But%20Crates%21"
+# Mark's response
+curl -X POST -H "PRIVATE-TOKEN: dddddddddddddddddddd" "http://localhost/api/v4/projects/2/issues/1/notes?body=No."
+# Daniel's response
+curl -X POST -H "PRIVATE-TOKEN: bbbbbbbbbbbbbbbbbbbb" "http://localhost/api/v4/projects/2/issues/1/notes?body=Strong%20memory%20management%21"
+# Carmen's response
+curl -X POST -H "PRIVATE-TOKEN: eeeeeeeeeeeeeeeeeeee" "http://localhost/api/v4/projects/2/issues/1/notes?body=No."
+# Daniel's response
+curl -X POST -H "PRIVATE-TOKEN: bbbbbbbbbbbbbbbbbbbb" "http://localhost/api/v4/projects/2/issues/1/notes?body=The%20ecosystem%21"
+# Louis' response
+curl -X POST -H "PRIVATE-TOKEN: ffffffffffffffffffff" "http://localhost/api/v4/projects/2/issues/1/notes?body=No."
 
 # Assign the issue to the player
 curl -H "PRIVATE-TOKEN: aaaaaaaaaaaaaaaaaaaa" -X POST "http://localhost/api/v4/projects/2/issues?title=CI%2fCD%20Problem%20with%20Docker%20Container&assignee_id=8&description=Hey%20${player_username}%2C%20when%20you%20get%20a%20chance%20can%20you%20take%20a%20look%20at%20our%20CI%2FCD%20config%20%28gitlab-ci.yml%29%3F%20Something%20is%20going%20on%20with%20it.%20I%20was%20trying%20to%20build%20our%20new%20Docker%20container%20but%20it%20wasn%27t%20working%20right.%20Thanks%21"
