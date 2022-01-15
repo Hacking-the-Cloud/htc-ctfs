@@ -41,6 +41,7 @@ data "template_file" "target_user_data" {
   vars = {
     gitlab_root_password = resource.random_string.gitlab_root_password.result
     player_username      = var.player_username
+    gamemaster_bucket = aws_s3_bucket.gamemaster_bucket.id
   }
 }
 
@@ -59,6 +60,7 @@ resource "aws_instance" "target_service" {
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.ctf_subnet.id
   vpc_security_group_ids      = [aws_security_group.allow_http.id]
+  iam_instance_profile        = aws_iam_instance_profile.cicd_service_profile.name
   depends_on                  = [aws_internet_gateway.ctf_gw]
 
   user_data = data.template_file.target_user_data.rendered
@@ -83,7 +85,7 @@ resource "aws_iam_role" "cicd_service_role" {
       {
         Action = "sts:AssumeRole"
         Effect = "Allow"
-        Sid = ""
+        Sid    = ""
         Principal = {
           Service = "ec2.amazonaws.com"
         }
@@ -93,8 +95,13 @@ resource "aws_iam_role" "cicd_service_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "attach_cicd_service_role" {
-  role      = aws_iam_role.cicd_service_role.name
+  role       = aws_iam_role.cicd_service_role.name
   policy_arn = aws_iam_policy.read_gamemaster_bucket.arn
+}
+
+resource "aws_iam_instance_profile" "cicd_service_profile" {
+  name = "cicd_service_instance_profile"
+  role = aws_iam_role.cicd_service_role.name
 }
 
 resource "aws_iam_policy" "read_gamemaster_bucket" {
@@ -110,4 +117,16 @@ resource "aws_iam_policy" "read_gamemaster_bucket" {
       }
     ]
   })
+}
+
+resource "aws_s3_bucket" "gamemaster_bucket" {
+  bucket_prefix = "gamemaster-htc-"
+  acl = "private"
+}
+
+resource "aws_s3_bucket_object" "objects" {
+  for_each = fileset("./gamemaster", "*")
+  bucket = aws_s3_bucket.gamemaster_bucket.id
+  key = each.value
+  source = "./gamemaster/${each.value}"
 }
