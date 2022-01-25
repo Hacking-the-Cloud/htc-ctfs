@@ -41,7 +41,7 @@ data "template_file" "target_user_data" {
   vars = {
     gitlab_root_password = resource.random_string.gitlab_root_password.result
     player_username      = var.player_username
-    gamemaster_bucket = aws_s3_bucket.gamemaster_bucket.id
+    gamemaster_bucket    = aws_s3_bucket.gamemaster_bucket.id
   }
 }
 
@@ -111,9 +111,15 @@ resource "aws_iam_policy" "read_gamemaster_bucket" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = ["s3:GetObject"]
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
         Effect   = "Allow"
-        Resource = "*"
+        Resource = [
+          aws_s3_bucket.gamemaster_bucket.arn,
+          "${aws_s3_bucket.gamemaster_bucket.arn}/*"
+        ]
       }
     ]
   })
@@ -121,12 +127,12 @@ resource "aws_iam_policy" "read_gamemaster_bucket" {
 
 resource "aws_s3_bucket" "gamemaster_bucket" {
   bucket_prefix = "gamemaster-htc-"
-  acl = "private"
+  acl           = "private"
 }
 
 resource "aws_s3_bucket_object" "objects" {
   for_each = fileset("./gamemaster", "*")
-  bucket = aws_s3_bucket.gamemaster_bucket.id
-  key = each.value
-  source = "./gamemaster/${each.value}"
+  bucket   = aws_s3_bucket.gamemaster_bucket.id
+  key      = each.value
+  source   = "./gamemaster/${each.value}"
 }

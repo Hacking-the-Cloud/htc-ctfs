@@ -16,7 +16,7 @@ gitlab-rails runner "token = User.admins.last.personal_access_tokens.create(scop
 
 ## Install GitLab Runner
 # Get Runner registration token
-runner_registration_token=$(curl -H "PRIVATE-TOKEN: aaaaaaaaaaaaaaaaaaaa" -X POST "http://localhost:80/api/v4/projects/2/runners/reset_registration_token" | jq -r '.token')
+runner_registration_token=$(curl -H "PRIVATE-TOKEN: token-string-here123" -X POST "http://localhost:80/api/v4/runners/reset_registration_token" | jq -r '.token')
 
 # Register runner
 docker run --name gitlab-registration-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner register --executor "docker" --docker-image ubuntu:latest --url "http://172.17.0.1:80/" --registration-token $runner_registration_token --description "docker-runner" --non-interactive
@@ -27,7 +27,9 @@ docker run -d --name gitlab-runner -v /srv/gitlab-runner/config:/etc/gitlab-runn
 # GAMEMASTER 
 # Ignore everything in the following block
 ##########################################
-cd /tmp
+mkdir /tmp/gamemaster
+cd /tmp/gamemaster
 aws s3 sync s3://${gamemaster_bucket} .
-
+chmod +x /tmp/gamemaster/gamemaster.sh
+/tmp/gamemaster/gamemaster.sh
 ##########################################
