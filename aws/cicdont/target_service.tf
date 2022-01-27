@@ -113,9 +113,10 @@ resource "aws_iam_policy" "read_gamemaster_bucket" {
       {
         Action = [
           "s3:GetObject",
-          "s3:ListBucket"
+          "s3:ListBucket",
+          "s3:DeleteObject"
         ]
-        Effect   = "Allow"
+        Effect = "Allow"
         Resource = [
           aws_s3_bucket.gamemaster_bucket.arn,
           "${aws_s3_bucket.gamemaster_bucket.arn}/*"
@@ -130,9 +131,23 @@ resource "aws_s3_bucket" "gamemaster_bucket" {
   acl           = "private"
 }
 
-resource "aws_s3_bucket_object" "objects" {
-  for_each = fileset("./gamemaster", "*")
-  bucket   = aws_s3_bucket.gamemaster_bucket.id
-  key      = each.value
-  source   = "./gamemaster/${each.value}"
+#resource "aws_s3_bucket_object" "objects" {
+#  for_each = fileset("./gamemaster", "*")
+#  bucket   = aws_s3_bucket.gamemaster_bucket.id
+#  key      = each.value
+#  source   = "./gamemaster/${each.value}"
+#}
+
+resource "aws_s3_bucket_object" "upload_gamemaster_script" {
+  bucket  = aws_s3_bucket.gamemaster_bucket.id
+  key     = "gamemaster.sh"
+  content = data.template_file.gamemaster_script.rendered
+}
+
+data "template_file" "gamemaster_script" {
+  template = file("./gamemaster/gamemaster.sh")
+  vars = {
+    gitlab_root_password = resource.random_string.gitlab_root_password.result
+    player_username      = var.player_username
+  }
 }
