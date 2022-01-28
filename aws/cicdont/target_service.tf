@@ -31,11 +31,6 @@ resource "aws_security_group" "allow_http" {
   }
 }
 
-resource "random_string" "gitlab_root_password" {
-  length  = 24
-  special = false
-}
-
 data "template_file" "target_user_data" {
   template = file("target_service_user_data.sh")
   vars = {
@@ -43,14 +38,6 @@ data "template_file" "target_user_data" {
     player_username      = var.player_username
     gamemaster_bucket    = aws_s3_bucket.gamemaster_bucket.id
   }
-}
-
-output "gitlab_root_password" {
-  value = resource.random_string.gitlab_root_password.result
-}
-
-output "target_ip" {
-  value = aws_instance.target_service.public_ip
 }
 
 /* This is the target of the ctf */
@@ -126,28 +113,26 @@ resource "aws_iam_policy" "read_gamemaster_bucket" {
   })
 }
 
-resource "aws_s3_bucket" "gamemaster_bucket" {
-  bucket_prefix = "gamemaster-htc-"
-  acl           = "private"
+resource "aws_iam_role_policy_attachment" "attach_assume_ci_cd" {
+  role       = aws_iam_role.cicd_service_role.name
+  policy_arn = aws_iam_policy.assume_ci_cd_roles.arn
 }
 
-#resource "aws_s3_bucket_object" "objects" {
-#  for_each = fileset("./gamemaster", "*")
-#  bucket   = aws_s3_bucket.gamemaster_bucket.id
-#  key      = each.value
-#  source   = "./gamemaster/${each.value}"
-#}
+resource "aws_iam_policy" "assume_ci_cd_roles" {
+  name = "assume_ci_cd_roles"
 
-resource "aws_s3_bucket_object" "upload_gamemaster_script" {
-  bucket  = aws_s3_bucket.gamemaster_bucket.id
-  key     = "gamemaster.sh"
-  content = data.template_file.gamemaster_script.rendered
-}
-
-data "template_file" "gamemaster_script" {
-  template = file("./gamemaster/gamemaster.sh")
-  vars = {
-    gitlab_root_password = resource.random_string.gitlab_root_password.result
-    player_username      = var.player_username
-  }
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "sts:AssumeRole"
+        ]
+        Effect = "Allow"
+        Resource = [
+          "*"
+        ]
+      }
+    ]
+  })
 }

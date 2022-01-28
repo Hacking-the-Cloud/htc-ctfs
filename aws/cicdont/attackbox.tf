@@ -83,6 +83,14 @@ resource "aws_main_route_table_association" "ctf_main_rt_assoc" {
   route_table_id = aws_route_table.ctf_route_table.id
 }
 
+data "template_file" "attackbox_user_data" {
+  template = file("attackbox_user_data.sh")
+  vars = {
+    player_password = random_string.gitlab_root_password.result
+    player_username = var.player_username
+  }
+}
+
 /* This is the host the player can attack/recieve shells from */
 resource "aws_instance" "attackbox" {
   ami                         = data.aws_ami.ubuntu_ami.id
@@ -92,7 +100,7 @@ resource "aws_instance" "attackbox" {
   vpc_security_group_ids      = [aws_security_group.allow_everything.id]
   depends_on                  = [aws_internet_gateway.ctf_gw]
 
-  user_data = file("attackbox_user_data.sh")
+  user_data = data.template_file.attackbox_user_data.rendered
 
   tags = {
     Name = "attackbox"

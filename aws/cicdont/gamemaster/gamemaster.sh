@@ -11,6 +11,8 @@ mark_token=$(openssl rand -hex 20)
 carmen_token=$(openssl rand -hex 20)
 louis_token=$(openssl rand -hex 20)
 
+echo $mark_token > /tmp/mark_token
+
 # Create ashley
 curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=ashley@cloud.local&username=ashley&name=ashley&force_random_password=true&skip_confirmation=true"
 # Create mark
@@ -41,16 +43,12 @@ curl -H "PRIVATE-TOKEN: $ashley_token" -X POST "http://localhost:80/api/v4/proje
 curl -H "PRIVATE-TOKEN: $ashley_token" -X POST "http://localhost/api/v4/projects?name=hackingthe.cloud&default_branch=main&import_url=https%3A%2F%2Fgithub.com%2FHacking-the-Cloud%2Fhackingthe.cloud%2F&visibility=internal"
 
 # Fix everyone's profile pictures
-cd /tmp
-git clone http://oauth-token:$ashley_token@localhost/ashley/mvp-docker
-curl -X PUT --form "avatar=@/tmp/mvp-docker/pics/ashley_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/2
-curl -X PUT --form "avatar=@/tmp/mvp-docker/pics/mark_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/3
-curl -X PUT --form "avatar=@/tmp/mvp-docker/pics/carmen_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/4
-curl -X PUT --form "avatar=@/tmp/mvp-docker/pics/sam_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/5
-curl -X PUT --form "avatar=@/tmp/mvp-docker/pics/louis_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/6
-curl -X PUT --form "avatar=@/tmp/mvp-docker/pics/daniel_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/7
-rm -rf /tmp/mvp-docker
-
+curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/ashley_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/2
+curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/mark_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/3
+curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/carmen_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/4
+curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/sam_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/5
+curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/louis_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/6
+curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/daniel_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/7
 
 # Creating Daniel's projects
 curl -H "PRIVATE-TOKEN: $daniel_token" -X POST "http://localhost/api/v4/projects?name=mkdocs-material&default_branch=master&import_url=https%3A%2F%2Fgithub.com%2Fsquidfunk%2Fmkdocs-material&visibility=internal"
@@ -84,6 +82,25 @@ curl -X POST -H "PRIVATE-TOKEN: $carmen_token" "http://localhost/api/v4/projects
 curl -X POST -H "PRIVATE-TOKEN: $daniel_token" "http://localhost/api/v4/projects/2/issues/1/notes?body=The%20ecosystem%21"
 # Louis' response
 curl -X POST -H "PRIVATE-TOKEN: $louis_token" "http://localhost/api/v4/projects/2/issues/1/notes?body=No."
+
+# Create Mark's projects
+curl -X POST -H "PRIVATE-TOKEN: $mark_token" "http://localhost/api/v4/projects?name=infra-deployer&visibility=internal"
+cd /tmp
+git clone http://oauth2:$mark_token@localhost/mark/infra-deployer
+cd infra-deployer
+git switch -c main
+cp -r /tmp/gamemaster/infra-deployer/* .
+git config user.name "mark"
+git config user.email "mark@cloud.local"
+git add *
+git commit -m "Adding README"
+git push origin main
+cd /tmp
+rm -rf /tmp/infra-deployer
+
+# Add environment variables
+curl -X POST -H "PRIVATE-TOKEN: $mark_token" "http://localhost/api/v4/projects/6/variables?key=access_key&value=${access_key}"
+curl -X POST -H "PRIVATE-TOKEN: $mark_token" "http://localhost/api/v4/projects/6/variables?key=secret_key&value=${secret_key}"
 
 # Assign the issue to the player
 curl -H "PRIVATE-TOKEN: $ashley_token" -X POST "http://localhost/api/v4/projects/2/issues?title=CI%2fCD%20Problem%20with%20Docker%20Container&assignee_id=8&description=Hey%20${player_username}%2C%20when%20you%20get%20a%20chance%20can%20you%20take%20a%20look%20at%20our%20CI%2FCD%20config%20%28gitlab-ci.yml%29%3F%20Something%20is%20going%20on%20with%20it.%20I%20was%20trying%20to%20build%20our%20new%20Docker%20container%20but%20it%20wasn%27t%20working%20right.%20Thanks%21"

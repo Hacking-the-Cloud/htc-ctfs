@@ -11,6 +11,7 @@ host_ip=$(curl -s checkip.amazonaws.com)
 admin_token=$(openssl rand -hex 20)
 echo $admin_token > /tmp/admin_token
 
+apt update
 apt-get install -y curl openssh-server ca-certificates tzdata perl docker.io jq awscli
 curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | bash
 EXTERNAL_URL="http://$host_ip" GITLAB_ROOT_PASSWORD="${gitlab_root_password}" apt-get install gitlab-ee
@@ -27,6 +28,7 @@ sleep 2
 
 # Start runner
 docker run -d --name gitlab-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner
+
 
 # GAMEMASTER 
 # Ignore everything in the following block
