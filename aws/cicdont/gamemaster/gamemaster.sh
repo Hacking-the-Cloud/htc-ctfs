@@ -60,7 +60,7 @@ curl -H "PRIVATE-TOKEN: $daniel_token" -X POST "http://localhost/api/v4/projects
 curl -H "PRIVATE-TOKEN: $sam_token" -X POST "http://localhost/api/v4/projects?name=Dank-Learning&default_branch=master&import_url=https%3A%2F%2Fgithub.com%2Falpv95%2FDank-Learning&visibility=internal"
 
 # Create Player
-curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=${player_username}@cloud.local&username=${player_username}&name=${player_username}&password=${gitlab_root_password}&skip_confirmation=true"
+curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=${player_username}@cloud.local&username=${player_username}&name=${player_username}&password=${player_password}&skip_confirmation=true"
 # Add player to target_project
 curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/projects/2/members" --data "user_id=8&access_level=40"
 

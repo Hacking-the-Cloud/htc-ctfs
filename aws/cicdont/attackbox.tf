@@ -86,7 +86,7 @@ resource "aws_main_route_table_association" "ctf_main_rt_assoc" {
 data "template_file" "attackbox_user_data" {
   template = file("attackbox_user_data.sh")
   vars = {
-    player_password = random_string.gitlab_root_password.result
+    player_password = random_string.player_password.result
     player_username = var.player_username
   }
 }

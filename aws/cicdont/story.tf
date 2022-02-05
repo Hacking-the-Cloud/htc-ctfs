@@ -3,12 +3,17 @@ variable "player_username" {
   description = "What is your name? (only used for story purposes)"
 }
 
-output "story_description" {
-  value = "Hi"
+resource "random_string" "player_password" {
+  length  = 24
+  special = false
 }
 
-output "gitlab_root_password" {
-  value = resource.random_string.gitlab_root_password.result
+output "player_username" {
+  value = var.player_username
+}
+
+output "player_password" {
+  value = resource.random_string.player_password.result
 }
 
 output "target_ip" {

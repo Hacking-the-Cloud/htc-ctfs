@@ -36,6 +36,7 @@ data "template_file" "target_user_data" {
   vars = {
     gitlab_root_password = resource.random_string.gitlab_root_password.result
     player_username      = var.player_username
+    player_password      = resource.random_string.player_password.result
     gamemaster_bucket    = aws_s3_bucket.gamemaster_bucket.id
   }
 }
