@@ -1,15 +1,8 @@
 #!/bin/bash
-apt update
-apt upgrade -y
-useradd -m -s /bin/bash -p $(openssl passwd -1 nicknick) nick
-usermod -aG sudo nick
-sed -i "/^[^#]*PasswordAuthentication[[:space:]]no/c\PasswordAuthentication yes" /etc/ssh/sshd_config
-systemctl restart sshd
 
-# Install GitLab and tools
+# Install GitLab
 host_ip=$(curl -s checkip.amazonaws.com)
 admin_token=$(openssl rand -hex 20)
-echo $admin_token > /tmp/admin_token
 
 apt update
 apt-get install -y curl openssh-server ca-certificates tzdata perl docker.io jq awscli

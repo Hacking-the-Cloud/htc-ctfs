@@ -11,8 +11,6 @@ mark_token=$(openssl rand -hex 20)
 carmen_token=$(openssl rand -hex 20)
 louis_token=$(openssl rand -hex 20)
 
-echo $mark_token > /tmp/mark_token
-
 # Create ashley
 curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=ashley@cloud.local&username=ashley&name=ashley&force_random_password=true&skip_confirmation=true"
 # Create mark
@@ -104,4 +102,3 @@ curl -X POST -H "PRIVATE-TOKEN: $mark_token" "http://localhost/api/v4/projects/6
 
 # Assign the issue to the player
 curl -H "PRIVATE-TOKEN: $ashley_token" -X POST "http://localhost/api/v4/projects/2/issues?title=CI%2fCD%20Problem%20with%20Docker%20Container&assignee_id=8&description=Hey%20${player_username}%2C%20when%20you%20get%20a%20chance%20can%20you%20take%20a%20look%20at%20our%20CI%2FCD%20config%20%28gitlab-ci.yml%29%3F%20Something%20is%20going%20on%20with%20it.%20I%20was%20trying%20to%20build%20our%20new%20Docker%20container%20but%20it%20wasn%27t%20working%20right.%20Thanks%21"
-echo blah > /tmp/done
