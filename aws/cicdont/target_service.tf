@@ -1,3 +1,8 @@
+/* This is used to get the player ip address and block unauthorized access to the target */
+data "http" "player_ip" {
+  url = "https://checkip.amazonaws.com"
+}
+
 resource "aws_security_group" "allow_http" {
   name        = "allow_http"
   description = "Allow 80/tcp inbound"
@@ -8,7 +13,7 @@ resource "aws_security_group" "allow_http" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${chomp(data.http.player_ip.body)}/32"]
   }
 
   egress {
@@ -21,6 +26,15 @@ resource "aws_security_group" "allow_http" {
   tags = {
     Name = "allow_http"
   }
+}
+
+resource "aws_security_group_rule" "allow_local_http_rule" {
+  security_group_id = aws_security_group.allow_http.id
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  type              = "ingress"
+  cidr_blocks       = ["${aws_instance.target_service.public_ip}/32"]
 }
 
 data "template_file" "target_user_data" {
