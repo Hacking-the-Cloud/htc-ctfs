@@ -9,7 +9,7 @@ This is an AWS/GitLab CI/CD themed CTF that you can run in your own AWS account.
 
 Costs should be minimal, running this infrastructure in my own account for two hours didn't accrue a cent in the Billing Dashboard, however extended time frames may cause costs to add up.
 
-In terms of difficulty, it would be rated low. The goal is more about having fun and working through some simple CI/CD/AWS challenges.
+In terms of difficulty, it would be rated low. The goal is more about having fun and working through some simple CI/CD/AWS challenges that even non-security folks would enjoy.
 
 ## How to Play
 Clone this repository and navigate to the cicdont directory.
@@ -19,15 +19,18 @@ git clone https://github.com/Hacking-the-Cloud/htc-ctfs.git
 cd htc-ctfs/aws/cicdont
 ```
 
-To deploy the CTF environment run the Terraform apply command.
+To deploy the CTF environment run the Terraform init/apply command.
 
 ```
+terraform init
 terraform apply
 ```
 
 You will be prompted with two questions. The first is a consent related to the costs of the CTF (Again, these should be minimal however the environment should still be taken down when you're finished with it). The second is asking your player name. **Please do not use special characters in the name, only upper and lower case letters**. This will be used in the game.
 
 **Please note: It will take around 15 minutes for all the infrastructure to be deployed and ready.** This 15 minute timer begins **AFTER** the Terraform apply has completed. This time is used to install all the software, create the NPCs, etc.
+
+**Also note: To be able to access the vulnerable instance, Terraform will attempt to determine your public ip address and create a security group that only that ip address can access.** If you cannot access the target_ip (explained below) after 15 minutes, check the AWS console for a security group named `allow_http` and ensure that it's configuration would allow you to reach it. 
 
 To destroy the CTF environment run the Terraform destroy command.
 
@@ -57,6 +60,8 @@ ssh <player username>@<attackbox IP>
 http://<target IP>/<player username>
 ```
 
+**Please Note: To be able to access the vulnerable instance, Terraform will attempt to determine your public ip address and create a security group that only that ip address can access.** If you cannot access the target_ip (explained below) after 15 minutes, check the AWS console for a security group named `allow_http` and ensure that it's configuration would allow you to reach it. 
+
 If you see any references to `gamemaster`, please ignore it. Those scripts are used to simulate the NPCs and have them complete their lore tasks. It is unrelated to the challenge.
 
 ## The Story
@@ -76,6 +81,7 @@ The following is a step by step walkthrough of the CTF. You can refer to this if
 To begin the CTF we must first stand up all the infrastructure. We do this using Terraform.
 
 ```
+terraform init
 terraform apply
 ```
 
