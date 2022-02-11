@@ -4,6 +4,9 @@ An AWS/GitLab CI/CD CTF.
 # WARNING
 *This CTF is currently in beta. Please monitor the infrastructure and be wary of costs. This has been extensively tested from my own setup however I'm unsure what may happen in others.*
 
+## NOTE
+This project will deploy intentionally vulnerable software/infrastructure to your AWS account. Please ensure there is no sensitive or irrecoverable data in the account. Attempts have been made to mitigate this however they may not be fullproof; Security Group rules only allow access to the vulnerable EC2 instance from your public IP address, and a randomly generated password is required to access it. 
+
 ## Background
 This is an AWS/GitLab CI/CD themed CTF that you can run in your own AWS account. All that is required is an AWS account and Terraform [installed](https://learn.hashicorp.com/tutorials/terraform/install-cli) locally on your machine.
 
