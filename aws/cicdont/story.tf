@@ -1,6 +1,11 @@
 variable "player_username" {
   type        = string
-  description = "What is your name? (only used for story purposes)"
+  description = "What is your name? (only used for story purposes. Upper and lowercase letters ONLY)"
+
+  validation {
+    condition     = can(regex("^[A-Za-z]+$", var.player_username))
+    error_message = "Only lower and uppercase letters are allowed in the username."
+  }
 }
 
 resource "random_string" "player_password" {
