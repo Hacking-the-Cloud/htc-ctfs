@@ -12,17 +12,17 @@ carmen_token=$(openssl rand -hex 20)
 louis_token=$(openssl rand -hex 20)
 
 # Create ashley
-curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=ashley@cloud.local&username=ashley&name=ashley&force_random_password=true&skip_confirmation=true"
+ashley_id=$(curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=ashley@cloud.local&username=ashley&name=ashley&force_random_password=true&skip_confirmation=true" | jq -r '.id')
 # Create mark
-curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=mark@cloud.local&username=mark&name=mark&force_random_password=true&skip_confirmation=true"
+mark_id=$(curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=mark@cloud.local&username=mark&name=mark&force_random_password=true&skip_confirmation=true" | jq -r '.id')
 # Create carmen
-curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=carmen@cloud.local&username=carmen&name=carmen&force_random_password=true&skip_confirmation=true"
+carmen_id=$(curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=carmen@cloud.local&username=carmen&name=carmen&force_random_password=true&skip_confirmation=true" | jq -r '.id')
 # Create sam
-curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=sam@cloud.local&username=sam&name=sam&force_random_password=true&skip_confirmation=true"
+sam_id=$(curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=sam@cloud.local&username=sam&name=sam&force_random_password=true&skip_confirmation=true" | jq -r '.id')
 # Create louis
-curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=louis@cloud.local&username=louis&name=louis&force_random_password=true&skip_confirmation=true"
+louis_id=$(curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=louis@cloud.local&username=louis&name=louis&force_random_password=true&skip_confirmation=true" | jq -r '.id')
 # Create daniel
-curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=daniel@cloud.local&username=daniel&name=daniel&force_random_password=true&skip_confirmation=true"
+daniel_id=$(curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=daniel@cloud.local&username=daniel&name=daniel&force_random_password=true&skip_confirmation=true" | jq -r '.id')
 
 # Create ashley access token
 gitlab-rails runner "token = User.find_by_username('ashley').personal_access_tokens.create(scopes: [:api], name: 'automation'); token.set_token('$ashley_token'); token.save!"
@@ -41,12 +41,12 @@ curl -H "PRIVATE-TOKEN: $ashley_token" -X POST "http://localhost:80/api/v4/proje
 curl -H "PRIVATE-TOKEN: $ashley_token" -X POST "http://localhost/api/v4/projects?name=hackingthe.cloud&default_branch=main&import_url=https%3A%2F%2Fgithub.com%2FHacking-the-Cloud%2Fhackingthe.cloud%2F&visibility=internal"
 
 # Fix everyone's profile pictures
-curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/ashley_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/2
-curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/mark_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/3
-curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/carmen_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/4
-curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/sam_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/5
-curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/louis_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/6
-curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/daniel_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/7
+curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/ashley_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/$ashley_id
+curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/mark_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/$mark_id
+curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/carmen_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/$carmen_id
+curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/sam_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/$sam_id
+curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/louis_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/$louis_id
+curl -X PUT --form "avatar=@/tmp/gamemaster/profile_pictures/daniel_50.jpg" -H "PRIVATE-TOKEN: $1" http://localhost/api/v4/users/$daniel_id
 
 # Creating Daniel's projects
 curl -H "PRIVATE-TOKEN: $daniel_token" -X POST "http://localhost/api/v4/projects?name=mkdocs-material&default_branch=master&import_url=https%3A%2F%2Fgithub.com%2Fsquidfunk%2Fmkdocs-material&visibility=internal"
@@ -58,9 +58,9 @@ curl -H "PRIVATE-TOKEN: $daniel_token" -X POST "http://localhost/api/v4/projects
 curl -H "PRIVATE-TOKEN: $sam_token" -X POST "http://localhost/api/v4/projects?name=Dank-Learning&default_branch=master&import_url=https%3A%2F%2Fgithub.com%2Falpv95%2FDank-Learning&visibility=internal"
 
 # Create Player
-curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=${player_username}@cloud.local&username=${player_username}&name=${player_username}&password=${player_password}&skip_confirmation=true"
+player_id=$(curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=${player_username}@cloud.local&username=${player_username}&name=${player_username}&password=${player_password}&skip_confirmation=true" | jq -r '.id')
 # Add player to target_project
-curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/projects/2/members" --data "user_id=8&access_level=40"
+curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/projects/2/members" --data "user_id=$player_id&access_level=40"
 
 # Adding Ashley's Joke Comment
 curl -H "PRIVATE-TOKEN: $ashley_token" -X POST "http://localhost/api/v4/projects/2/issues/1/notes?body=No."
