@@ -4,13 +4,6 @@
 # Answer: This is all the "behind the scenes" activities to create the NPCs, along with their comments and what not.
 # If you've somehow found this script while playing the CTF you can safely ignore it. Or use it to your advantage, idk.
 
-ashley_token=$(openssl rand -hex 20)
-daniel_token=$(openssl rand -hex 20)
-sam_token=$(openssl rand -hex 20)
-mark_token=$(openssl rand -hex 20)
-carmen_token=$(openssl rand -hex 20)
-louis_token=$(openssl rand -hex 20)
-
 # Create ashley
 ashley_id=$(curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=ashley@cloud.local&username=ashley&name=ashley&force_random_password=true&skip_confirmation=true" | jq -r '.id')
 # Create mark
@@ -25,12 +18,12 @@ louis_id=$(curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?em
 daniel_id=$(curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=daniel@cloud.local&username=daniel&name=daniel&force_random_password=true&skip_confirmation=true" | jq -r '.id')
 
 # Create ashley access token
-gitlab-rails runner "token = User.find_by_username('ashley').personal_access_tokens.create(scopes: [:api], name: 'automation'); token.set_token('$ashley_token'); token.save!"
-gitlab-rails runner "token = User.find_by_username('daniel').personal_access_tokens.create(scopes: [:api], name: 'danielauto'); token.set_token('$daniel_token'); token.save!"
-gitlab-rails runner "token = User.find_by_username('sam').personal_access_tokens.create(scopes: [:api], name: 'samauto'); token.set_token('$sam_token'); token.save!"
-gitlab-rails runner "token = User.find_by_username('mark').personal_access_tokens.create(scopes: [:api], name: 'markauto'); token.set_token('$mark_token'); token.save!"
-gitlab-rails runner "token = User.find_by_username('carmen').personal_access_tokens.create(scopes: [:api], name: 'carmenauto'); token.set_token('$carmen_token'); token.save!"
-gitlab-rails runner "token = User.find_by_username('louis').personal_access_tokens.create(scopes: [:api], name: 'louisauto'); token.set_token('$louis_token'); token.save!"
+ashley_token=$(curl -X POST -H "PRIVATE-TOKEN: $1" --data "name=automation" --data "scopes[]=api" "http://localhost/api/v4/users/$ashley_id/personal_access_tokens" | jq -r '.token')
+mark_token=$(curl -X POST -H "PRIVATE-TOKEN: $1" --data "name=markauto" --data "scopes[]=api" "http://localhost/api/v4/users/$mark_id/personal_access_tokens" | jq -r '.token')
+carmen_token=$(curl -X POST -H "PRIVATE-TOKEN: $1" --data "name=carmenauto" --data "scopes[]=api" "http://localhost/api/v4/users/$carmen_id/personal_access_tokens" | jq -r '.token')
+sam_token=$(curl -X POST -H "PRIVATE-TOKEN: $1" --data "name=samauto" --data "scopes[]=api" "http://localhost/api/v4/users/$sam_id/personal_access_tokens" | jq -r '.token')
+louis_token=$(curl -X POST -H "PRIVATE-TOKEN: $1" --data "name=louisauto" --data "scopes[]=api" "http://localhost/api/v4/users/$louis_id/personal_access_tokens" | jq -r '.token')
+daniel_token=$(curl -X POST -H "PRIVATE-TOKEN: $1" --data "name=danielauto" --data "scopes[]=api" "http://localhost/api/v4/users/$daniel_id/personal_access_tokens" | jq -r '.token')
 
 # Create mvp-docker project
 curl -H "PRIVATE-TOKEN: $ashley_token" -X POST "http://localhost:80/api/v4/projects?name=mvp-docker&default_branch=main&import_url=https%3A%2F%2Fgithub.com%2FFrichetten%2Fmvp-docker&visibility=internal"

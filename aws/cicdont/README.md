@@ -31,9 +31,9 @@ terraform apply
 
 You will be prompted with two questions. The first is a consent related to the costs of the CTF (Again, these should be minimal however the environment should still be taken down when you're finished with it). The second is asking your player name. **Please do not use special characters in the name, only upper and lower case letters**. This will be used in the game.
 
-**Please note: It will take around 15 minutes for all the infrastructure to be deployed and ready.** This 15 minute timer begins **AFTER** the Terraform apply has completed. This time is used to install all the software, create the NPCs, etc.
+**Please note: It will take around 10 minutes for all the infrastructure to be deployed and ready.** This 10 minute timer begins **AFTER** the Terraform apply has completed. This time is used to install all the software, create the NPCs, etc.
 
-**Also note: To be able to access the vulnerable instance, Terraform will attempt to determine your public ip address and create a security group that only that ip address can access.** If you cannot access the target_ip (explained below) after 15 minutes, check the AWS console for a security group named `allow_http` and ensure that it's configuration would allow you to reach it. 
+**Also note: To be able to access the vulnerable instance, Terraform will attempt to determine your public ip address and create a security group that only that ip address can access.** If you cannot access the target_ip (explained below) after 10 minutes, check the AWS console for a security group named `allow_http` and ensure that it's configuration would allow you to reach it. 
 
 To destroy the CTF environment run the Terraform destroy command.
 
@@ -57,13 +57,13 @@ To access the attackbox, you can ssh using your player username and password.
 ssh <player username>@<attackbox IP>
 ```
 
-**It will take approximately 15 minutes for all the infrastructure to finish deploying.** If you'd like to test if it's finished, you should be able to access a particular endpoint. If you get an error, it's not finished. If instead you land at a profile page, you can be assured it's done.
+**It will take approximately 10 minutes for all the infrastructure to finish deploying.** If you'd like to test if it's finished, you should be able to access a particular endpoint. If you get an error, it's not finished. If instead you land at a profile page, you can be assured it's done.
 
 ```
 http://<target IP>/<player username>
 ```
 
-**Please Note: To be able to access the vulnerable instance, Terraform will attempt to determine your public ip address and create a security group that only that ip address can access.** If you cannot access the target_ip (explained below) after 15 minutes, check the AWS console for a security group named `allow_http` and ensure that it's configuration would allow you to reach it. 
+**Please Note: To be able to access the vulnerable instance, Terraform will attempt to determine your public ip address and create a security group that only that ip address can access.** If you cannot access the target_ip (explained below) after 10 minutes, check the AWS console for a security group named `allow_http` and ensure that it's configuration would allow you to reach it. 
 
 If you see any references to `gamemaster`, please ignore it. Those scripts are used to simulate the NPCs and have them complete their lore tasks. It is unrelated to the challenge.
 
@@ -99,11 +99,11 @@ After this, you will be asked if you'd like to perform the deployment. Answer wi
 The Terraform deployment will begin.
 
 ### Wait
-You will now need to wait 15 minutes for the deployment to finish. Please note, that 15 minute timer starts **AFTER** you get the "Apply complete" notification. 
+You will now need to wait 10 minutes for the deployment to finish. Please note, that 10 minute timer starts **AFTER** you get the "Apply complete" notification. 
 
 ![Output](screenshots/output.png)
 
-Does it really take 15 minutes? Yes, it takes a little bit to get everything setup. You can take this time to get familiar with your attackbox. This is an EC2 instance you can use for whatever you need during the CTF, particularly to catch shells.
+Does it really take 10 minutes? Yes, it takes a little bit to get everything setup. You can take this time to get familiar with your attackbox. This is an EC2 instance you can use for whatever you need during the CTF, particularly to catch shells.
 
 You can ssh into the box using your username and password
 
@@ -112,7 +112,7 @@ ssh <player_username>@<target_ip>
 ```
 
 ### Getting Started
-After waiting those 15 minutes, you finally have a target. You can navigate to the target_ip to see a GitLab instance. Log in using your player username and password.
+After waiting those 10 minutes, you finally have a target. You can navigate to the target_ip to see a GitLab instance. Log in using your player username and password.
 
 ![Home](screenshots/home.png)
 
