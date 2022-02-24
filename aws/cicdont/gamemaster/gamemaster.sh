@@ -89,6 +89,9 @@ git push origin main
 cd /tmp
 rm -rf /tmp/infra-deployer
 
+# Add root (admin) to infra-deployer
+curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/projects/6/members" --data "user_id=1&access_level=40"
+
 # Add environment variables
 curl -X POST -H "PRIVATE-TOKEN: $mark_token" "http://localhost/api/v4/projects/6/variables?key=access_key&value=${access_key}"
 curl -X POST -H "PRIVATE-TOKEN: $mark_token" "http://localhost/api/v4/projects/6/variables?key=secret_key&value=${secret_key}"
