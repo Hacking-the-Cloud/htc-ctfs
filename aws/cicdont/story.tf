@@ -33,3 +33,7 @@ resource "random_string" "gitlab_root_password" {
 output "attackbox_ip" {
   value = aws_instance.attackbox.public_ip
 }
+
+output "time_warning" {
+  value = "Please be aware the CTF will be ready 10 minutes from the time this message is first displayed"
+}
