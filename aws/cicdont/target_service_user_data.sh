@@ -10,10 +10,12 @@ curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.de
 EXTERNAL_URL="http://$host_ip" GITLAB_ROOT_PASSWORD="${gitlab_root_password}" apt-get install gitlab-ee
 gitlab-rails runner 'ApplicationSetting.last.update(signup_enabled: false)'
 gitlab-rails runner "token = User.admins.last.personal_access_tokens.create(scopes: [:api], name: 'automation'); token.set_token('$admin_token'); token.save!"
+sleep 2
 
 ## Install GitLab Runner
 # Get Runner registration token
 runner_registration_token=$(curl -H "PRIVATE-TOKEN: $admin_token" -X POST "http://localhost:80/api/v4/runners/reset_registration_token" | jq -r '.token')
+sleep 2
 
 # Register runner
 docker run --name gitlab-registration-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner register --executor "docker" --url "http://172.17.0.1:80/" --registration-token "$runner_registration_token" --description "docker-runner" --docker-image "ubuntu:latest" --docker-volumes /var/run/docker.sock:/var/run/docker.sock --non-interactive
