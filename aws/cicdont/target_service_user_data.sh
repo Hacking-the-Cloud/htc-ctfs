@@ -13,20 +13,28 @@ gitlab-rails runner "token = User.admins.last.personal_access_tokens.create(scop
 sleep 2
 
 ## Install GitLab Runner
-# Get Runner registration token
-runner_registration_token=$(curl -H "PRIVATE-TOKEN: $admin_token" -X POST "http://localhost:80/api/v4/runners/reset_registration_token" | jq -r '.token')
-sleep 2
+# Get Runner registration token (sleeps are to give it time to catch up)
+runner_registration_token=""
+while [[ $${#runner_registration_token} -ne 20 ]]
+do
+    runner_registration_token=$(curl -H "PRIVATE-TOKEN: $admin_token" -X POST "http://localhost:80/api/v4/runners/reset_registration_token" | jq -r '.token')
+    sleep 4
+done
 
 # Register runner
-docker run --name gitlab-registration-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner register --executor "docker" --url "http://172.17.0.1:80/" --registration-token "$runner_registration_token" --description "docker-runner" --docker-image "ubuntu:latest" --docker-volumes /var/run/docker.sock:/var/run/docker.sock --non-interactive
-sleep 2
+register="failed"
+while [[ "$register" == *"failed"* ]]
+do
+    register=$(docker run --rm --name gitlab-registration-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner register --executor "docker" --url "http://172.17.0.1:80/" --registration-token "$runner_registration_token" --description "docker-runner" --docker-image "ubuntu:latest" --docker-volumes /var/run/docker.sock:/var/run/docker.sock --non-interactive)
+    sleep 4
+done
 
 # Start runner
 docker run -d --name gitlab-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner
 
 
 # GAMEMASTER 
-# Ignore everything in the following block
+# Ignore everything in the following block. This is for gameplay purposes
 ##########################################
 mkdir /tmp/gamemaster
 cd /tmp/gamemaster
