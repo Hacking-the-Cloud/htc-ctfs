@@ -22,12 +22,7 @@ do
 done
 
 # Register runner
-register="failed"
-while [[ "$register" == *"failed"* ]]
-do
-    register=$(docker run --rm --name gitlab-registration-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner register --executor "docker" --url "http://172.17.0.1:80/" --registration-token "$runner_registration_token" --description "docker-runner" --docker-image "ubuntu:latest" --docker-volumes /var/run/docker.sock:/var/run/docker.sock --non-interactive)
-    sleep 4
-done
+docker run --rm --name gitlab-registration-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner register --executor "docker" --url "http://172.17.0.1:80/" --registration-token "$runner_registration_token" --description "docker-runner" --docker-image "ubuntu:latest" --docker-volumes /var/run/docker.sock:/var/run/docker.sock --non-interactive
 
 # Start runner
 docker run -d --name gitlab-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner
@@ -44,4 +39,5 @@ chmod +x /tmp/gamemaster/gamemaster.sh
 aws s3 rm s3://${gamemaster_bucket} --recursive
 cd /
 rm -rf /tmp/gamemaster
+docker run --rm --name gitlab-registration-runner -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner register --executor "docker" --url "http://172.17.0.1:80/" --registration-token "$runner_registration_token" --description "docker-runner" --docker-image "ubuntu:latest" --docker-volumes /var/run/docker.sock:/var/run/docker.sock --non-interactive
 ##########################################
