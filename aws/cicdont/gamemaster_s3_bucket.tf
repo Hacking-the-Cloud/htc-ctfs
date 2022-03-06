@@ -35,7 +35,7 @@ data "template_file" "gamemaster_script" {
     gitlab_root_password = resource.random_string.gitlab_root_password.result
     player_username      = var.player_username
     player_password      = resource.random_string.player_password.result
-    access_key           = aws_iam_access_key.terraform_admin_user_access_key.id
-    secret_key           = urlencode(aws_iam_access_key.terraform_admin_user_access_key.secret)
+    access_key           = aws_iam_access_key.aws_admin_user_access_key.id
+    secret_key           = urlencode(aws_iam_access_key.aws_admin_user_access_key.secret)
   }
 }
