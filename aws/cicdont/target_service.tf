@@ -37,6 +37,15 @@ resource "aws_security_group_rule" "allow_local_http_rule" {
   cidr_blocks       = ["${aws_instance.target_service.public_ip}/32"]
 }
 
+resource "aws_security_group_rule" "allow_attackbox_inbound_rule" {
+  security_group_id = aws_security_group.allow_http.id
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  type              = "ingress"
+  cidr_blocks       = ["${aws_instance.attackbox.public_ip}/32"]
+}
+
 data "template_file" "target_user_data" {
   template = file("target_service_user_data.sh")
   vars = {
