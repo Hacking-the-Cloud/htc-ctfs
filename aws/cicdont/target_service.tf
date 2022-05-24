@@ -68,7 +68,7 @@ resource "aws_instance" "target_service" {
 
   ebs_block_device {
     device_name = "/dev/sda1"
-    volume_size = 16
+    volume_size = 24
   }
 
   user_data = data.template_file.target_user_data.rendered
