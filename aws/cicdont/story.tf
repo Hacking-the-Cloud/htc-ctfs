@@ -35,5 +35,5 @@ output "attackbox_ip" {
 }
 
 output "time_warning" {
-  value = "Please be aware the CTF will be ready 10 minutes from the time this message is first displayed"
+  value = "Please be aware the CTF will be ready 10-12 minutes from the time this message is first displayed"
 }
