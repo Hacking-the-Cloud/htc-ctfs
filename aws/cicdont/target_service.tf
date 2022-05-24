@@ -66,6 +66,11 @@ resource "aws_instance" "target_service" {
   iam_instance_profile        = aws_iam_instance_profile.cicd_service_profile.name
   depends_on                  = [aws_internet_gateway.ctf_gw]
 
+  ebs_block_device {
+    device_name = "/dev/sda1"
+    volume_size = 16
+  }
+
   user_data = data.template_file.target_user_data.rendered
 
   metadata_options {
