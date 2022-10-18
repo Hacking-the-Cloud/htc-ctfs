@@ -26,16 +26,11 @@ resource "aws_s3_bucket_object" "infra_deployer" {
 resource "aws_s3_bucket_object" "upload_gamemaster_script" {
   bucket  = aws_s3_bucket.gamemaster_bucket.id
   key     = "gamemaster.sh"
-  content = data.template_file.gamemaster_script.rendered
-}
-
-data "template_file" "gamemaster_script" {
-  template = file("./gamemaster/gamemaster.sh")
-  vars = {
+  content = templatefile("./gamemaster/gamemaster.sh", {
     gitlab_root_password = resource.random_string.gitlab_root_password.result
     player_username      = var.player_username
     player_password      = resource.random_string.player_password.result
     access_key           = aws_iam_access_key.aws_admin_user_access_key.id
     secret_key           = urlencode(aws_iam_access_key.aws_admin_user_access_key.secret)
-  }
+  })
 }
