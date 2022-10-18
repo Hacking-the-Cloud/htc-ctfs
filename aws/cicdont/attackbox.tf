@@ -47,14 +47,6 @@ resource "aws_security_group" "allow_inbound" {
   }
 }
 
-data "template_file" "attackbox_user_data" {
-  template = file("attackbox_user_data.sh")
-  vars = {
-    player_password = random_string.player_password.result
-    player_username = var.player_username
-  }
-}
-
 /* This is the host the player can attack/recieve shells from */
 resource "aws_instance" "attackbox" {
   ami                         = data.aws_ami.ubuntu_ami.id
@@ -64,7 +56,10 @@ resource "aws_instance" "attackbox" {
   vpc_security_group_ids      = [aws_security_group.allow_inbound.id]
   depends_on                  = [aws_internet_gateway.ctf_gw]
 
-  user_data = data.template_file.attackbox_user_data.rendered
+  user_data = templatefile("attackbox_user_data.sh", {
+    player_password = random_string.player_password.result
+    player_username = var.player_username
+  })
 
   tags = {
     Name = "attackbox"
