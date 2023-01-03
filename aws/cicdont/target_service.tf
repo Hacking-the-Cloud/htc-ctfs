@@ -13,7 +13,7 @@ resource "aws_security_group" "allow_http" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["${chomp(data.http.player_ip.body)}/32"]
+    cidr_blocks = ["${chomp(data.http.player_ip.response_body)}/32"]
   }
 
   egress {
