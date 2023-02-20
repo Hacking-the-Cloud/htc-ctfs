@@ -34,8 +34,7 @@ docker run -d --name gitlab-runner -v /srv/gitlab-runner/config:/etc/gitlab-runn
 mkdir /tmp/gamemaster
 cd /tmp/gamemaster
 aws s3 sync s3://${gamemaster_bucket} .
-chmod +x /tmp/gamemaster/gamemaster.sh
-/tmp/gamemaster/gamemaster.sh $admin_token
+/bin/bash /tmp/gamemaster/gamemaster.sh $admin_token
 aws s3 rm s3://${gamemaster_bucket} --recursive
 cd /
 rm -rf /tmp/gamemaster
