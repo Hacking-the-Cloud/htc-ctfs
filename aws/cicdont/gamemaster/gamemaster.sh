@@ -53,7 +53,7 @@ curl -H "PRIVATE-TOKEN: $sam_token" -X POST "http://localhost/api/v4/projects?na
 # Create Player
 player_id=$(curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/users?email=${player_username}@cloud.local&username=${player_username}&name=${player_username}&password=${player_password}&skip_confirmation=true" | jq -r '.id')
 # Add player to target_project
-curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/projects/2/members" --data "user_id=$player_id&access_level=40"
+curl -H "PRIVATE-TOKEN: $1" -X POST "http://localhost/api/v4/projects/1/members" --data "user_id=$player_id&access_level=40"
 
 # Adding Ashley's Joke Comment
 curl -H "PRIVATE-TOKEN: $ashley_token" -X POST "http://localhost/api/v4/projects/2/issues/1/notes?body=No."
