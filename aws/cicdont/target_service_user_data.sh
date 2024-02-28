@@ -9,7 +9,7 @@ apt-get install -y curl openssh-server ca-certificates tzdata perl docker.io jq 
 curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | bash
 EXTERNAL_URL="http://$host_ip" GITLAB_ROOT_PASSWORD="${gitlab_root_password}" apt-get install gitlab-ee
 gitlab-rails runner 'ApplicationSetting.last.update(signup_enabled: false)'
-gitlab-rails runner "token = User.admins.last.personal_access_tokens.create(scopes: [:api], name: 'automation'); token.set_token('$admin_token'); token.save!"
+gitlab-rails runner "token = User.admins.last.personal_access_tokens.create(scopes: [:api], name: 'automation', expires_at: 365.days.from_now); token.set_token('$admin_token'); token.save!"
 sleep 2
 
 ## Install GitLab Runner
